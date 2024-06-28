@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Gestión de Desviaciones</title>
+    <style>
+        .prioridad-critica { background-color: red; color: white; }
+        .prioridad-moderada { background-color: yellow; color: black; }
+        .prioridad-leve { background-color: green; color: white; }
+        #form-logo { width: 50px; margin-right: 10px; }
+        h2 { font-size: 1.75rem; }
+        table { background-color: #ffffff; border-radius: 0.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        th, td { vertical-align: middle; }
+        th { background-color: #343a40; color: #ffffff; }
+        tr { transition: background-color 0.2s ease; }
+        tr:hover { background-color: #f1f1f1; }
+        .form-control { min-width: 150px; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex align-items-center">
+            <img id="form-logo" src="./logo.jpg" alt="Logo">
+            <h2>Gestión de Desviaciones</h2>
+        </div>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>NUMERO DE P.C</th>
+                    <th>RESPONSABLE</th>
+                    <th>PRIORIDAD</th>
+                    <th>ESTADO</th>
+                    <th>FECHA CAMBIO DE ESTADO</th>
+                    <th>FECHA DE RECEPCION DE SOLICITUD</th>
+                    <th>FECHA DE SOLUCION PROGRAMADA</th>
+                    <th>CANT. DIAS</th>
+                    <th>CASINO</th>
+                    <th>RESPONSABLE DEL PROBLEMA</th>
+                    <th>DESCRIPCION / PLAN DE ACCION</th>
+                    <th>AUDITORES</th>
+                    <th>CONTACTO</th>
+                    <th>CORREO</th>
+                    <th>FECHA ULTIMA MODIFICACION</th>
+                    <th>FOTOS</th>
+                    <th>NOMBRE DE FOTO</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-desviaciones">
+                <!-- Filas de ejemplo -->
+            </tbody>
+        </table>
+        <button class="btn btn-primary" onclick="agregarFila()">Agregar Fila</button>
+    </div>
+
+    <script>
+        const responsables = ['JOP de Alimentación', 'Bodeguero', 'Supervisor', 'Gerente'];
+        const prioridades = [
+            { valor: '03 LEVE', clase: 'prioridad-leve', dias: 45 },
+            { valor: '02 MODERADO', clase: 'prioridad-moderada', dias: 30 },
+            { valor: '01 CRITICO', clase: 'prioridad-critica', dias: 15 }
+        ];
+        const estados = ['Cerrado', 'Abierto'];
+        const responsablesProblema = ['RRHH', 'JOP Mantención', 'Alimentación', 'Bodega'];
+        const auditores = ['Tap Root', 'Inspección Barrick'];
+
+        function agregarFila() {
+            const tabla = document.getElementById('tabla-desviaciones');
+            const fila = document.createElement('tr');
+
+            const numeroPC = document.createElement('td');
+            numeroPC.innerText = tabla.rows.length + 1;
+            fila.appendChild(numeroPC);
+
+            const responsable = document.createElement('td');
+            responsable.innerHTML = crearComboBox(responsables);
+            fila.appendChild(responsable);
+
+            const prioridad = document.createElement('td');
+            prioridad.innerHTML = crearComboBoxPrioridades();
+            prioridad.querySelector('select').addEventListener('change', actualizarPrioridad);
+            fila.appendChild(prioridad);
+
+            const estado = document.createElement('td');
+            estado.innerHTML = crearComboBox(estados);
+            estado.querySelector('select').addEventListener('change', actualizarEstado);
+            fila.appendChild(estado);
+
+            const fechaCambioEstado = document.createElement('td');
+            fechaCambioEstado.innerText = '';
+            fila.appendChild(fechaCambioEstado);
+
+            const fechaRecepcionSolicitud = document.createElement('td');
+            fechaRecepcionSolicitud.innerText = new Date().toLocaleDateString('es-ES');
+            fila.appendChild(fechaRecepcionSolicitud);
+
+            const fechaSolucionProgramada = document.createElement('td');
+            fechaSolucionProgramada.innerText = '';
+            fila.appendChild(fechaSolucionProgramada);
+
+            const cantidadDias = document.createElement('td');
+            cantidadDias.innerText = '';
+            fila.appendChild(cantidadDias);
+
+            const casino = document.createElement('td');
+            casino.innerText = 'BARRIALES';
+            fila.appendChild(casino);
+
+            const responsableProblema = document.createElement('td');
+            responsableProblema.innerHTML = crearComboBox(responsablesProblema);
+            fila.appendChild(responsableProblema);
+
+            const descripcionPlan = document.createElement('td');
+            descripcionPlan.innerHTML = '<input type="text" class="form-control">';
+            fila.appendChild(descripcionPlan);
+
+            const auditoresCol = document.createElement('td');
+            auditoresCol.innerHTML = crearComboBox(auditores);
+            fila.appendChild(auditoresCol);
+
+            const contacto = document.createElement('td');
+            contacto.innerHTML = crearComboBox(responsables);
+            fila.appendChild(contacto);
+
+            const correo = document.createElement('td');
+            correo.innerHTML = '<input type="email" class="form-control">';
+            fila.appendChild(correo);
+
+            const fechaUltimaModificacion = document.createElement('td');
+            fechaUltimaModificacion.innerText = '';
+            fila.appendChild(fechaUltimaModificacion);
+
+            const fotos = document.createElement('td');
+            fotos.innerHTML = '<select class="form-control"><option>No</option><option>Si</option></select>';
+            fila.appendChild(fotos);
+
+            const nombreFoto = document.createElement('td');
+            nombreFoto.innerHTML = '<input type="text" class="form-control">';
+            fila.appendChild(nombreFoto);
+
+            tabla.appendChild(fila);
+        }
+
+        function crearComboBox(options) {
+            let html = '<select class="form-control">';
+            options.forEach(option => {
+                html += `<option>${option}</option>`;
+            });
+            html += '</select>';
+            return html;
+        }
+
+        function crearComboBoxPrioridades() {
+            let html = '<select class="form-control">';
+            prioridades.forEach(p => {
+                html += `<option class="${p.clase}">${p.valor}</option>`;
+            });
+            html += '</select>';
+            return html;
+        }
+
+        function actualizarPrioridad(event) {
+            const fila = event.target.closest('tr');
+            const prioridadSeleccionada = prioridades.find(p => p.valor === event.target.value);
+            fila.className = prioridadSeleccionada.clase;
+
+            const fechaRecepcion = new Date(fila.cells[5].innerText.split('/').reverse().join('-'));
+            const fechaSolucion = new Date(fechaRecepcion);
+            fechaSolucion.setDate(fechaRecepcion.getDate() + prioridadSeleccionada.dias);
+            fila.cells[6].innerText = fechaSolucion.toLocaleDateString('es-ES');
+
+            const diferenciaDias = Math.ceil((fechaSolucion - fechaRecepcion) / (1000 * 60 * 60 * 24));
+            fila.cells[7].innerText = diferenciaDias;
+
+            fila.cells[14].innerText = new Date().toLocaleDateString('es-ES');
+        }
+
+        function actualizarEstado(event) {
+            const fila = event.target.closest('tr');
+            fila.cells[4].innerText = new Date().toLocaleDateString('es-ES');
+        }
+
+        agregarFila();
+        agregarFila();
+        agregarFila();
+    </script>
+</body>
+</html>
